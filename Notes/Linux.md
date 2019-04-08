@@ -45,7 +45,7 @@
 
 2. vi 和 vim 三种模式的相互转化
 
-   ![](image\vi关系转换图.png)
+   ![](https://github.com/Zbeginner/StudyNotes/blob/master/image/vi%E5%85%B3%E7%B3%BB%E8%BD%AC%E6%8D%A2%E5%9B%BE.png)
 
    - wq 保存并推出
    - q 仅退出(如修改文本内容需使用q!)
