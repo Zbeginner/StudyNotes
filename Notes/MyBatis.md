@@ -58,7 +58,7 @@
         </typeAliases>
         ```
 
-### 实现新增
+### 事务
 
 1. 概念
    1. 功能
@@ -74,3 +74,103 @@
 4. **增删改的时候一定要提交事务** 即session.commit()(暂时我不懂，好像不commit数据没法更新数据库)
 5. 事务回滚
    - 如果一个事务中的某个SQL执行错误，希望回归到事务的原点，保证数据库数据的完整性。即session.rollbacn()。
+
+### 关联映射
+
+经常我们一个实体类中经常包含其它实体类的对象
+
+```java
+@Data
+class Stduent{
+    private Integer studentId;
+    private String name;
+    private String studentNumber;
+    private Integer teacherId;
+    //需要装配的对象
+    private Teacher teacher;
+}
+```
+
+#### 业务装配
+
+ResultMap Mapping映射
+
+```xml
+<resultMap id="BaseResultMap" type="cn.cafuc.cs.zzy.model.Student">
+    <id column="student_id" jdbcType="INTEGER" property="studentId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="student_number" jdbcType="VARCHAR" property="studentNumber" />
+    <result column="teacher_id" jdbcType="INTEGER" property="teacherId" />
+</resultMap>
+<select id="getAll" resultMap="BaseResultMap">
+    select * from student
+</select>
+```
+
+ 对应Service
+
+```java
+public void showStudent(){
+    //先获得基础的学生对象
+    List<Student> students=studentMapper.getAll();
+    for(Student tem:students){
+        //业务(手动)装配对应的teacher对象到对应属性
+        tem.teacher=teacherMapper.selectById(tem.teacherId);
+    }
+}
+```
+
+#### < association />标签(一对一关系映射)
+
+实体类
+
+```java
+@Data
+class Stduent{
+    private Integer studentId;
+    private String name;
+    private String studentNumber;
+    //需要装配的对象
+    private Teacher teacher;
+}
+```
+
+
+
+```xml
+<mapper namespace="cn.cafuc.cs.zzy.mapper.StudentMapper">
+<resultMap id="BaseResultMap" type="cn.cafuc.cs.zzy.model.Student">
+    <id column="student_id" jdbcType="INTEGER" property="studentId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="student_number" jdbcType="VARCHAR" property="studentNumber" />
+    <!-- property 映射到实体类的对象的属性-->
+    <!-- javaType 指定映射到实体对象的属性-->
+    <!-- column 指定表中的属性-->
+    <!-- select 指定引入嵌套查询的子SQL语句-->
+    <!-- 四个属性的位置是没有顺序的-->
+    <association property="teacher"
+                 javaType="cn.cafuc.cs.zzy.model.Teacher" 
+                 column="teacherId"
+                 select="cn.cafuc.cs.zzy.mapper.TeacherMapper.selectById">
+    </association>
+</resultMap>
+<select id="getAll" resultMap="BaseResultMap">
+    select * from student
+</select>
+</mapper>
+```
+
+- Mybatis 属于懒装配，每个属性只装配一次，也就是如果用了< association />标签，提前使用了teacherId这个属性，那么在getAll里面，将不会给对象装配teacherId这个属性（如果对象有这个属性的话）。
+
+- 用**< association />**标签和**业务装配** 所达到的效果和效率是一样的。因为用**< association />** 实际上也是运行了两个SQL语句
+
+  ```sql	
+  #第一条
+  select * from student
+  #第二条
+  select * from teacher where id=#{teacherId}
+  #然后再把第二条的结果赋值给实体对象的teacher对象。
+  #所以效率其实是一样的
+  ```
+
+  
