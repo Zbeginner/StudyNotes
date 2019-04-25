@@ -173,4 +173,44 @@ class Stduent{
   #所以效率其实是一样的
   ```
 
-  
+
+### 一些小应用
+
+1. get/set的应用
+
+   有的时候我们存入数据库中的数据并不是原始值。
+
+   ```java
+   public class Cart {
+       //订餐时间范围  前端设计的值是[中餐、晚餐、明日中餐、明日晚餐]
+       //数据库中设定的值是[1、2、3、4]分别对应
+       private Integer spec;
+   }
+   ```
+
+   。麻瓜的手动判断修改，每次都会浪费很多时间精力。有的时候可以这样处理一下。
+
+   ```java
+   public class Cart {
+       //订餐时间范围
+       private Integer spec;
+       //我们预先可以判断给spec赋值的只会有前端传给我们的String和mybatis装配的Integer
+       public void setSpec(Object spec) {
+          if(spec.getClass()==String.class){
+              switch ((String)spec){
+                  case "中餐":this.spec=1;break;
+                  case "晚餐":this.spec=2;break;
+                  case "明日中餐":this.spec=3;break;
+                  case "明日晚餐":this.spec=4;break;
+                  default:;
+              }
+          }else{
+              this.spec=(Integer)spec;
+          }
+       }
+   }
+   ```
+
+   
+
+   
