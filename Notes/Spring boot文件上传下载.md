@@ -61,13 +61,38 @@ public interface MultipartFile extends InputStreamSource {
 #### 后端
 
 ```java
+@PostMapping("/upload")
+    public String importRentInfo(MultipartFile file, HttpServletResponse response) throws IOException {
+
+        String filename = file.getOriginalFilename();
+        //     存在项目的某个目录下
+        String pathName = System.getProperty("user.dir") + "/UploadFile/" + filename ;
+        //     存在指定目录下  String pathName="C:/UploadFile/"+filename;
+        Path path = Paths.get(pathName);
+        //     判断路径是否存在如果不存在则创建对应文件夹
+        if (!Files.isWritable(path)) {
+            Files.createDirectories(Paths.get(System.getProperty("user.dir") + "/UploadFile"));
+        //      Files.createDirectories(Paths.get("C:/LISBackupFile"));
+        }
+        try {
+            Files.write(path, file.getBytes());//将文件存入本地
+        }catch (Exception e){
+            return "Error";
+        }
+        return "Success";
+    }
+```
+
+
+
+```java
  /**
-  * 直接上多文件，单文件的处理也差不多
+  * 多文件
   * @param files
   * @param request
   * @return
   */
-@PostMapping("/upload")
+@PostMapping("/upload2")
     public String filerUpload(@RequestParam("file") List<MultipartFile> files, HttpServletRequest request){
         if(!files.isEmpty()&&files.size()>0){
             for(MultipartFile file:files){
@@ -96,4 +121,49 @@ public interface MultipartFile extends InputStreamSource {
 ```
 
 ### 文件下载
+
+#### 前端
+
+```html
+<body>
+    <a href="http://127.0.0.1:8080/test">文件下载</a>
+</body>
+```
+
+#### 后端
+
+```java
+ /**
+  * 下载测试文件
+  */
+@GetMapping("/test")
+public ResponseEntity<InputStream> downloadTestFile(HttpServletRequest request)throws Exception{
+        return download(request,"下载测试.txt");
+}
+
+public ResponseEntity download(HttpServletRequest request, String filename)throws Exception{
+    	//从项目目录下获取要下载的文件
+        Resource resource=new ClassPathResource("static/"+filename);
+    	//设置请求头
+        HttpHeaders headers=new HttpHeaders();
+    	//对文件名编码，防止中文文件乱码
+        filename=this.getFilename(request,filename);
+        headers.setContentDispositionFormData("attachment",filename);
+        headers.setContentType(MediaType.parseMediaType("application/force-download"));
+        return  ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(resource.getInputStream()));
+}
+public String getFilename(HttpServletRequest request,String filename)throws Exception{
+        String[] IEBrowserKeyWords={"MSIE","Trident","Edge"};
+        String userAgent=request.getHeader("User-Agent");
+        for(String keyWord:IEBrowserKeyWords){
+            if(userAgent.contains(keyWord)){
+                return URLEncoder.encode(filename,"UTF-8");
+            }
+        }
+        return new String(filename.getBytes("UTF-8"),"ISO-8859-1");
+}
+```
 
