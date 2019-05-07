@@ -9,6 +9,10 @@
 - 主机模式
   - Linux是一台独立的主机，不能访问外网
 
+### 设定IP地址
+
+
+
 ## 文件目录
 
 - /bin 是Binary的缩写，这个目录存放着最经常使用的命令
@@ -45,7 +49,7 @@
 
 2. vi 和 vim 三种模式的相互转化
 
-   ![](https://github.com/Zbeginner/StudyNotes/blob/master/image/vi%E5%85%B3%E7%B3%BB%E8%BD%AC%E6%8D%A2%E5%9B%BE.png)
+   ![](image\vi关系转换图.png)
 
    - wq 保存并推出
    - q 仅退出(如修改文本内容需使用q!)
