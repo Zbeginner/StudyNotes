@@ -89,7 +89,9 @@
 
         eg: useradd  xm  添加一个名为xm的用户
 
-        eg: userad -d /home/test xq 在/home/test目录下增加一个xq的用户
+        eg: useradd -d /home/test xq 在/home/test目录下增加一个xq的用户
+
+        eg:useradd -g groupname username  
 
    2. 给用户指定或者修改密码
 
@@ -123,8 +125,12 @@
    - groupdel 组名
 3. 创建用户时，分配组
    - adduser -g 组名 用户名
-4. 更改组
+4. 更改用户组
    - usermod-g 组名 用户名
+5. 配置文件：
+   1. /etc/passwd  用户信息文件
+   2. /etc/group 组信息文件
+   3. /etc/shadow 用户密码信息
 
 ## 找回密码
 
@@ -198,4 +204,39 @@
 
 5、-i是交互模式。使用这个选项，rm命令在删除任何文件前提示用户确认。
 ```
+
+## 防火墙
+
+状态查看
+
+service iptables status
+
+临时关闭防火墙
+
+service iptables stop 
+
+## 端口状态
+
+netstat -nplt 
+
+netstat -nplt | grep java
+
+## 文件跨机器拷贝SCP
+
+scp  -r /opt/xxx root@hadoop101:/opt   将本机器的opt目录下的xxx目录下的所有文件拷贝到hadoop101机器上的opt目录下
+
+scp -r root@hadoop100:/etc/profile /etc/profile  拉取hadoop100上的文件到自己的机器上
+
+scp -r root@hadoop100:/etc/profile root@hadoop103:/etc/profile 
+
+## SSH免密登陆
+
+```shell
+cd #进入家目录
+cd .ssh/ #如果没有这个目录，先ssh远程登陆一个即可
+ssh-keygen -t rsa # 生成公私钥
+ssh-copy-id hadoop103 #将公钥拷贝到103机器上
+```
+
+## 跨服务器文件同步rsync
 
