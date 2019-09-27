@@ -238,5 +238,11 @@ ssh-keygen -t rsa # 生成公私钥
 ssh-copy-id hadoop103 #将公钥拷贝到103机器上
 ```
 
-## 跨服务器文件同步rsync
+
+
+## Centos6 修改系统时间
+
+1. root权限
+2. date -s “要设置的时间”   设置系统当前的软件时间，只设置软件时间关机后会失效
+3. hwclock -w    同步bios的硬件时间
 
